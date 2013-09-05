@@ -10,6 +10,11 @@ urlpatterns = patterns('',
 	(r'^login/$', 'django.contrib.auth.views.login'), 
         (r'^logout/$','engiapp.views.logout_page'), 
         (r'^register/$','engiapp.views.register_page'),
+        (r'^committee/$','engiapp.views.all_committee'),
+        (r'^committee/(?P<committee_id>\d+)/$','engiapp.views.committee'),
+        (r'^events/$','engiapp.views.all_events'),
+        (r'^events/(?P<event_id>\d+)/$' , 'engiapp.views.event'),
+
 	(r'^register/success/$',TemplateView.as_view(template_name="registration/register_success.html")), 
     # Examples:
     # url(r'^$', 'engisite.views.home', name='home'),
