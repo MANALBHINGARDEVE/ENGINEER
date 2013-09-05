@@ -1,3 +1,12 @@
+bin/
+first/
+include/
+lib/
+local/
+polls/
+Procfile
+requirements.txt
+ENGINEER/
 *.pyc
-venv
+venv/
 *.db

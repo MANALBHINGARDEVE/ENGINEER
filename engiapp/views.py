@@ -1,13 +1,16 @@
 # Create your views here.
 
+from django.core import serializers
 from django.shortcuts import render_to_response
 from django.template import RequestContext 
 from django.contrib.auth import logout
-from django.http import HttpResponseRedirect
+from django.http import *
 from engiapp.forms import *
 from engiapp.models import *
+import json
 from random import choice
 from string import letters
+from django.shortcuts import render_to_response , get_object_or_404
 
 def main_page(request): 
     	variables = RequestContext(request, {})
@@ -35,3 +38,17 @@ def register_page(request):
         form = RegistrationForm() 
     variables = RequestContext(request, {'form': form }) 
     return render_to_response('registration/register.html', variables ) 
+
+def all_committee(request):
+    return HttpResponse(serializers.serialize("json", Committee.objects.all()))
+
+def committee(request,committee_id):
+    return HttpResponse(serializers.serialize("json",EngiEvents.objects.filter(pk=committee_id)))
+
+def all_events(request):
+    # response_data = EngiEvents.objects.all()
+    return HttpResponse(serializers.serialize("json", EngiEvents.objects.all()))    
+
+def event(request,event_id):
+    # p = get_object_or_404(EngiEvents , pk=event_id)
+    return HttpResponse(serializers.serialize("json",EngiEvents.objects.filter(pk=event_id)))
