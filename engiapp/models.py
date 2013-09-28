@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
+
+
+
 class Committee(models.Model):
 	comittee_name=models.CharField(max_length=50)
 
@@ -30,9 +33,6 @@ class Team(models.Model):
 	team_name=models.CharField(max_length=50)
 	team_leader=models.ForeignKey(Student)
 	members=models.ManyToManyField(User)
-	#team_events=models.ManyToManyField(Events)
+	team_events=models.ManyToManyField(EngiEvents)
 	
-
-
-
 

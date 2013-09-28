@@ -52,3 +52,30 @@ def all_events(request):
 def event(request,event_id):
     # p = get_object_or_404(EngiEvents , pk=event_id)
     return HttpResponse(serializers.serialize("json",EngiEvents.objects.filter(pk=event_id)))
+
+def event_register_page(request):
+    if request.method == 'POST': #user has submitted the form
+        form = EventRegistrationForm(request.POST)
+        if form.is_valid():
+	    committee=Committee.objects.get(comittee_name=form.cleaned_data['committee_name'])
+            engi_event = EngiEvents( event_name=form.cleaned_data['event_name'],team_size=form.cleaned_data['team_size'],day_of_event=form.cleaned_data['day_of_event'],event_description=form.cleaned_data['event_description'],committee=committee)
+	    engi_event.save()
+	    return HttpResponseRedirect('/register/success/') 
+    else: 
+        form = EventRegistrationForm() 
+    variables = RequestContext(request, {'form': form }) 
+    return render_to_response('registration/event_register.html', variables ) 
+
+
+def committee_register_page(request):
+    if request.method == 'POST': #user has submitted the form
+        form = CommitteeRegistrationForm(request.POST)
+        if form.is_valid():
+	    committee=Committee(comittee_name=form.cleaned_data['committee_name'])
+	    committee.save()
+	    return HttpResponseRedirect('/register/success/') 
+    else: 
+        form = CommitteeRegistrationForm() 
+    variables = RequestContext(request, {'form': form }) 
+    return render_to_response('registration/committee_register.html', variables ) 
+

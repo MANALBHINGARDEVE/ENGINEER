@@ -14,7 +14,8 @@ urlpatterns = patterns('',
         (r'^committee/(?P<committee_id>\d+)/$','engiapp.views.committee'),
         (r'^events/$','engiapp.views.all_events'),
         (r'^events/(?P<event_id>\d+)/$' , 'engiapp.views.event'),
-
+	(r'^register_event/$' , 'engiapp.views.event_register_page'),
+	(r'^register_committee/$' , 'engiapp.views.committee_register_page'),
 	(r'^register/success/$',TemplateView.as_view(template_name="registration/register_success.html")), 
     # Examples:
     # url(r'^$', 'engisite.views.home', name='home'),

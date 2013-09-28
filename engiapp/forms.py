@@ -1,6 +1,7 @@
 from django import forms 
 import re
 from django.contrib.auth.models import User 
+from engiapp.models import *
 from django.forms.extras.widgets import SelectDateWidget
 BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
 
@@ -30,3 +31,29 @@ class RegistrationForm(forms.Form):
 	except User.DoesNotExist:
 		return email
 	raise forms.ValidationError('An account is already registerd under this email.')
+
+
+class EventRegistrationForm(forms.Form): 
+    event_name=forms.CharField(label=u'Name')
+    team_size=forms.IntegerField(label=u'team size')
+    day_of_event=forms.DateField(label=u'Date of Event',widget=SelectDateWidget(years=(2013,)))
+    event_description=forms.CharField(label=u'description', max_length=30) 
+    committee=forms.ChoiceField(label='committee',choices=[(x, y) for x,y in enumerate(["comps","ece"])])
+    def clean_event_name(self):
+	event_name=self.cleaned_data['event_name']
+	try:
+		EngiEvents.objects.get(event_name=event_name)
+	except EngiEvents.DoesNotExist:
+		return event_name
+	raise forms.ValidationError('An event is already registerd under this name.')
+
+class CommitteeRegistrationForm(forms.Form): 
+	committee_name=forms.CharField(label=u'Name')
+	def clean_committee_name(self):
+		committee_name=self.cleaned_data['committee_name']
+		try:
+			Committee.objects.get(comittee_name=committee_name)
+		except Committee.DoesNotExist:
+			return committee_name
+		raise forms.ValidationError('An Committee is already registerd under this name.')
+
