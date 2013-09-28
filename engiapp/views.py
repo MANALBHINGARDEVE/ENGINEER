@@ -57,8 +57,8 @@ def event_register_page(request):
     if request.method == 'POST': #user has submitted the form
         form = EventRegistrationForm(request.POST)
         if form.is_valid():
-	    committee=Committee.objects.get(comittee_name=form.cleaned_data['committee_name'])
-            engi_event = EngiEvents( event_name=form.cleaned_data['event_name'],team_size=form.cleaned_data['team_size'],day_of_event=form.cleaned_data['day_of_event'],event_description=form.cleaned_data['event_description'],committee=committee)
+	    committee=Committee.objects.get(comittee_name=form.cleaned_data['committee'].comittee_name)
+            engi_event = EngiEvents( event_name=form.cleaned_data['event_name'],team_size=form.cleaned_data['team_size'],day_of_event=form.cleaned_data['day_of_event'],description=form.cleaned_data['event_description'],committee=committee)
 	    engi_event.save()
 	    return HttpResponseRedirect('/register/success/') 
     else: 
@@ -66,6 +66,22 @@ def event_register_page(request):
     variables = RequestContext(request, {'form': form }) 
     return render_to_response('registration/event_register.html', variables ) 
 
+def event_page(request,event_id):
+	engievent=get_object_or_404(EngiEvents,id=event_id)
+	registered=0
+	if request.method == 'POST': #user has submitted the form
+		if "Join event" in request.POST:
+			if request.user.is_authenticated():
+				student=Student.objects.get(user=request.user)
+				student.events.add(engievent)
+				registered=1
+	else:
+		if request.user.is_authenticated():
+			student=Student.objects.get(user=request.user)
+			if engievent in student.events.all():
+				registered=1
+	variables = RequestContext(request, {'engievent': engievent ,'registered':registered}) 
+    	return render_to_response('event_page.html', variables ) 
 
 def committee_register_page(request):
     if request.method == 'POST': #user has submitted the form
@@ -78,4 +94,12 @@ def committee_register_page(request):
         form = CommitteeRegistrationForm() 
     variables = RequestContext(request, {'form': form }) 
     return render_to_response('registration/committee_register.html', variables ) 
+
+def committee_page(request,committee_name):
+	committee=get_object_or_404(Committee, comittee_name=committee_name) 
+	engievents=committee.engievents_set.all()
+	#print engievents
+	variables = RequestContext(request, {'engievents':engievents})
+	return render_to_response('committee_page.html',variables)
+	
 

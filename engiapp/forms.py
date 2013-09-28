@@ -38,7 +38,8 @@ class EventRegistrationForm(forms.Form):
     team_size=forms.IntegerField(label=u'team size')
     day_of_event=forms.DateField(label=u'Date of Event',widget=SelectDateWidget(years=(2013,)))
     event_description=forms.CharField(label=u'description', max_length=30) 
-    committee=forms.ChoiceField(label='committee',choices=[(x, y) for x,y in enumerate(["comps","ece"])])
+    #committee=forms.ChoiceField(label='committee',choices=[(x, y.comittee_name) for x,y in enumerate(Committee.objects.all())])
+    committee=forms.ModelChoiceField(queryset=Committee.objects.all().order_by('comittee_name'))
     def clean_event_name(self):
 	event_name=self.cleaned_data['event_name']
 	try:
@@ -56,4 +57,6 @@ class CommitteeRegistrationForm(forms.Form):
 		except Committee.DoesNotExist:
 			return committee_name
 		raise forms.ValidationError('An Committee is already registerd under this name.')
+
+
 
