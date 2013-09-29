@@ -37,9 +37,10 @@ class Team(models.Model):
 	team_name=models.CharField(max_length=50)
 	team_leader=models.ForeignKey(Student)
 	members=models.ManyToManyField(User)
-	team_events=models.ManyToManyField(EngiEvents)
+	team_event=models.OneToOneField(EngiEvents)
+	unique_together=("team_event","team_name")
+	
 	
 class TeamJoinRequest(models.Model):
-	engievent=models.OnetoOneField(EngiEvent)
-	team=models.OnetoOneField(Team)
+	fromteam=models.OneToOneField(Team)
 	receivers= models.ManyToManyField(User)

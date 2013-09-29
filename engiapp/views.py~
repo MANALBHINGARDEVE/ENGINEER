@@ -39,6 +39,18 @@ def register_page(request):
     variables = RequestContext(request, {'form': form }) 
     return render_to_response('registration/register.html', variables ) 
 
+
+def user_page(request,username):
+	if request.user.is_authenticated():
+		user=get_object_or_404(User, username=username) 
+		if user!=request.user:
+			return HttpResponseRedirect('/login/') 
+	else:
+		return HttpResponseRedirect('/login/') 
+	variables = RequestContext(request) 
+    	return render_to_response('user_page.html', variables ) 
+
+
 def all_committee(request):
     return HttpResponse(serializers.serialize("json", Committee.objects.all()))
 
@@ -73,8 +85,11 @@ def event_page(request,event_id):
 		if "Join event" in request.POST:
 			if request.user.is_authenticated():
 				student=Student.objects.get(user=request.user)
-				student.events.add(engievent)
-				registered=1
+				if engievent.team_size==1:
+					student.events.add(engievent)
+					registered=1
+				else:
+					return HttpResponseRedirect('/register_team/%s/'%(event_id)) 
 	else:
 		if request.user.is_authenticated():
 			student=Student.objects.get(user=request.user)
@@ -82,6 +97,47 @@ def event_page(request,event_id):
 				registered=1
 	variables = RequestContext(request, {'engievent': engievent ,'registered':registered}) 
     	return render_to_response('event_page.html', variables ) 
+
+def team_register_page(request,event_id):
+	engievent=get_object_or_404(EngiEvents,id=event_id)
+	if request.method=='POST':
+		if request.user.is_authenticated():
+			form=TeamRegistrationForm(request.POST,extra=engievent.team_size)
+			if form.is_valid():
+				student=Student.objects.get(user=request.user)
+				team,created=Team.objects.get_or_create(team_name=form.cleaned_data['team_name'],team_leader=student,team_event=engievent)
+				team.members.add(request.user)
+				#team.save()
+				team_join_request,created=TeamJoinRequest.objects.get_or_create(fromteam=team)
+				for (u,user_mail ) in form.extra_answers():
+					to_user=get_object_or_404(User,email=user_mail)
+            				team_join_request.receivers.add(to_user)
+				team_join_request.save()
+				return HttpResponseRedirect('/register/success/') 
+	else:
+		form=TeamRegistrationForm(extra=engievent.team_size)
+	variables = RequestContext(request, {'form': form }) 
+    	return render_to_response('registration/team_register.html', variables )
+	
+
+def accept_team_request(request,req_id):
+	if request.user.is_authenticated():
+		teamjoinrequest=get_object_or_404(TeamJoinRequest,id=req_id)
+		if request.user in teamjoinrequest.receivers.all():
+			teamjoinrequest.receivers.remove(request.user)
+			teamjoinrequest.fromteam.members.add(request.user)
+		else:
+			return HttpResponseRedirect('/register/success/') 
+		if len(teamjoinrequest.receivers.all())==0:
+			team=teamjoinrequest.fromteam
+			leader=team.team_leader
+			leader.events.add(team.team_event)
+			for mem in team.members.all():
+				stud=Student.objects.get(user=mem)
+				stud.events.add(team.team_event)
+		return HttpResponseRedirect('/register/success/') 
+	else:
+		return HttpResponseRedirect('/login/') 
 
 def committee_register_page(request):
     if request.method == 'POST': #user has submitted the form

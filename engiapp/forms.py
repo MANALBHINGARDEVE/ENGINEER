@@ -59,4 +59,15 @@ class CommitteeRegistrationForm(forms.Form):
 		raise forms.ValidationError('An Committee is already registerd under this name.')
 
 
+class TeamRegistrationForm(forms.Form):
+	team_name=forms.CharField(label=u'Team Name', max_length=50) 
+	def __init__(self, *args, **kwargs):
+        	extra = kwargs.pop('extra')
+        	super(TeamRegistrationForm, self).__init__(*args, **kwargs)
 
+        	for i in range(extra-1):
+            		self.fields['custom_%s' % i] = forms.EmailField(label="user %s"%(i+1))
+	def extra_answers(self):
+        	for name, value in self.cleaned_data.items():
+            		if name.startswith('custom_'):
+                		yield (self.fields[name].label, value)

@@ -10,6 +10,8 @@ urlpatterns = patterns('',
 	(r'^login/$', 'django.contrib.auth.views.login'), 
         (r'^logout/$','engiapp.views.logout_page'), 
         (r'^register/$','engiapp.views.register_page'),
+	
+	(r'^user/(\w+)/$','engiapp.views.user_page'),	
 
 	(r'^committee/(\w+)/$','engiapp.views.committee_page'),
 
@@ -19,6 +21,10 @@ urlpatterns = patterns('',
         (r'^events/(?P<event_id>\d+)/$' , 'engiapp.views.event'),
 
 	(r'^event/(\d+)/$' , 'engiapp.views.event_page'),
+
+	(r'^register_team/(\d)+/$' , 'engiapp.views.team_register_page'),
+
+	(r'^accept_team_request/(\d)+/$' , 'engiapp.views.accept_team_request'),	
 
 	(r'^register_event/$' , 'engiapp.views.event_register_page'),
 	(r'^register_committee/$' , 'engiapp.views.committee_register_page'),
